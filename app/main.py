@@ -10,7 +10,6 @@ real environment variables take precedence over values in .env.
 import os
 import re
 import json
-from bson.json_util import dumps
 from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Literal, Optional
@@ -886,7 +885,7 @@ def explain_endpoint(
         parse_month(month)
         command = {"aggregate": "attendance_logs", "pipeline": late_leaderboard_pipeline(month, limit, department), "cursor": {}}
         collection = "attendance_logs"
-    else:
+    elif endpoint == "department_trend":
         if not department or not from_ or not to:
             raise HTTPException(422, "department, from and to are required")
         from_day = parse_iso_date(from_, "from")
@@ -895,16 +894,32 @@ def explain_endpoint(
             raise HTTPException(422, "invalid trend date range")
         if not db.employees.find_one({"department": department}, {"_id": 1}):
             raise HTTPException(404, "department not found")
-        command = {"aggregate": 1, "pipeline": department_trend_pipeline(department, from_day, to_day), "cursor": {}}
-        collection = "employees"
+
+        # Explain the indexed attendance-date query used inside the trend pipeline.
+        # Atlas rejects explain commands for the collectionless $documents pipeline.
+        command = {
+            "find": "attendance_logs",
+            "filter": {
+                "date": {
+                    "$gte": from_day.isoformat(),
+                    "$lte": to_day.isoformat(),
+                }
+            },
+            "sort": {"date": 1},
+        }
+        collection = "attendance_logs"
+
     try:
         explain = db.command("explain", command, verbosity="executionStats")
     except PyMongoError as exc:
-        raise HTTPException(422, f"could not explain query: {exc.__class__.__name__}")
-    explain_json = json.loads(dumps(explain))
+        raise HTTPException(
+            status_code=422,
+            detail=f"could not explain query: {exc.__class__.__name__}",
+        )
 
+    explain_json = json.loads(json.dumps(explain, default=str))
     return {
-    "endpoint": endpoint,
-    "collection": collection,
-    "explain": explain_json,
-}
+        "endpoint": endpoint,
+        "collection": collection,
+        "explain": explain_json,
+    }
