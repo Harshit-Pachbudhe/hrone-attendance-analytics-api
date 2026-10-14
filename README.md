@@ -31,6 +31,8 @@ Open `http://127.0.0.1:8000/docs`; `GET /health` checks the MongoDB connection. 
 
 Only load `sample_data/` into a disposable database. Do not run the sample seeder against a database whose contents you need to preserve.
 
-## Validation note
+## Validation Status
 
-The Python file has been syntax-compiled. Full end-to-end verification against a live MongoDB instance and the hidden evaluation dataset remains to be run before submission.
+Manual testing has been performed against a live MongoDB database for employee creation, attendance punch-in and punch-out, duplicate punch-in handling, unknown employee handling, attendance listing, monthly analytics, department summaries, late-arrival leaderboard, and department trends.
+
+The five administrative explain endpoints have returned successful responses. Final verification of query plans, invalid trend date-range handling, and all submission requirements is pending. The hidden evaluation dataset has not been tested.
