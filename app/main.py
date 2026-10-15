@@ -591,7 +591,7 @@ def employee_monthly(emp_code: str, month: str):
         raise HTTPException(404, "employee not found")
     result["month"] = month
     result["present_days"] = decimal_round(result.get("present_days", 0), 2)
-    result["attendance_pct"] = decimal_round(result.get("attendance_pct"), 2)
+    result["attendance_pct"] = decimal_round(result.get("attendance_pct"), 4)
     for key in ("working_days", "leave_days", "late_count", "total_late_minutes", "total_overtime_minutes"):
         result[key] = int(result.get(key) or 0)
     return result

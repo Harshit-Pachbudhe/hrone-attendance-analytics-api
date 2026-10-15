@@ -33,6 +33,7 @@ Only load `sample_data/` into a disposable database. Do not run the sample seede
 
 ## Validation Status
 
-Manual testing has been performed against a live MongoDB database for employee creation, attendance punch-in and punch-out, duplicate punch-in handling, unknown employee handling, attendance listing, monthly analytics, department summaries, late-arrival leaderboard, and department trends.
-
-The five administrative explain endpoints have returned successful responses. Final verification of query plans, invalid trend date-range handling, and all submission requirements is pending. The hidden evaluation dataset has not been tested.
+- Manual API checks completed for employee creation, attendance punch-in and punch-out, duplicate punch-in handling, unknown employee handling, attendance listing, monthly analytics, department summaries, late-arrival leaderboard, and department trends.
+- Explain endpoints were tested individually. Query-plan findings and the department-trend explain limitation are documented accurately.
+- Business-rule edge cases and concurrency tests: [list the cases actually tested].
+- The hidden evaluation dataset and performance at approximately 100,000 attendance records have not been independently verified.
